@@ -1,81 +1,70 @@
-var $game = $('#game');
+/* global $ BOARD_WIDTH:true BOARD_HEIGHT:true */
+
+
+const $game = $('#game');
 BOARD_WIDTH = 19;
 BOARD_HEIGHT = 10;
 
-$game.append(function () {
-  var str = '';
-  for (var i = 0; i < BOARD_HEIGHT; i++) {
-    str = str + '<div class="row">';
-    for (var j = 0; j < BOARD_WIDTH; j++) {
-      str = str + '<div class="cell"></div>';
+$game.append(() => {
+  let str = '';
+  for (let i = 0; i < BOARD_HEIGHT; i += 1) {
+    str += '<div class="row">';
+    for (let j = 0; j < BOARD_WIDTH; j += 1) {
+      str += '<div class="cell"></div>';
     }
-    str = str + '</div>';
+    str += '</div>';
   }
   return str;
 });
 
-function getcell (row, col) {
-  var $game = $('#game');
-  var $rows = $game.find('.row');
-  var $row = $($rows[row]);
-  var $cells = $row.find('.cell');
-  var $cell = $($cells[col]);
+function getcell(row, col) {
+  const $rows = $game.find('.row');
+  const $row = $($rows[row]);
+  const $cells = $row.find('.cell');
+  const $cell = $($cells[col]);
   return $cell;
 }
 
-////////////////////////////////////////////////
+// //////////////////////////////////////////////
 // Paddles
-function Paddle (column) {
+function Paddle(column) {
   this.pos = [
     [4, column],
     [5, column],
-    [6, column]
+    [6, column],
   ];
   this.column = column;
 }
 
-Paddle.prototype.draw = function () {
-  for (var i = 0; i < BOARD_HEIGHT; i++) {
-    var $cell = getcell(i, this.column);
-    $cell.removeClass('paddle')
+Paddle.prototype.draw = () => {
+  for (let i = 0; i < BOARD_HEIGHT; i += 1) {
+    const $cell = getcell(i, this.column);
+    $cell.removeClass('paddle');
   }
 
-  for (var i = 0; i < this.pos.length; i++) {
-    var $cell = getcell(this.pos[i][0], this.pos[i][1]);
+  for (let i = 0; i < this.pos.length; i += 1) {
+    const $cell = getcell(this.pos[i][0], this.pos[i][1]);
     $cell.addClass('paddle');
   }
-}
+};
 
-Paddle.prototype.up = function () {
-  if (this.pos[0][0] === 0) {
-  } else {
-    var newedge = [this.pos[0][0] - 1, this.pos[0][1]];
+Paddle.prototype.up = () => {
+  if (this.pos[0][0] !== 0) {
+    const newedge = [this.pos[0][0] - 1, this.pos[0][1]];
     this.pos.unshift(newedge);
     this.pos.pop();
   }
-}
+};
 
-Paddle.prototype.down = function () {
-  if (this.pos[2][0] === BOARD_HEIGHT - 1) {
-  } else {
-    var newedge = [this.pos[2][0] + 1, this.pos[2][1]];
+Paddle.prototype.down = () => {
+  if (this.pos[2][0] !== BOARD_HEIGHT - 1) {
+    const newedge = [this.pos[2][0] + 1, this.pos[2][1]];
     this.pos.push(newedge);
     this.pos.shift();
   }
-}
+};
 
-var lpaddle = new Paddle(0);
-var rpaddle = new Paddle(BOARD_WIDTH - 1)
-lpaddle.draw();
-rpaddle.draw()
-lpaddle.down()
-lpaddle.down()
-lpaddle.down()
-lpaddle.down()
-lpaddle.down()
-lpaddle.draw();
-
-function Ball (lpaddle, rpaddle) {
+function Ball(lpaddle, rpaddle) {
   this.pos = [5, 5];
   this.dirh = -1;
   this.dirv = 1;
@@ -83,24 +72,25 @@ function Ball (lpaddle, rpaddle) {
   this.rpaddle = rpaddle;
 }
 
-Ball.prototype.checkInLeftEnd = function () {
-  return this.pos[1] === 0;
-}
+Ball.prototype.checkInLeftEnd = () => this.pos[1] === 0;
 
-Ball.prototype.checkInRightEnd = function () {
-  return this.pos[1] === BOARD_WIDTH - 1;
-}
+Ball.prototype.checkInRightEnd = () => this.pos[1] === BOARD_WIDTH - 1;
 
-Ball.prototype.draw = function () {
-  var $cells = $('cell');
+Ball.prototype.draw = () => {
+  const $cells = $('cell');
   $cells.removeClass('ball');
-  $cell = getcell(this.pos);
+  const $cell = getcell(this.pos);
   $cell.addClass('ball');
-}
+};
 
-Ball.prototype.move = function () {
+Ball.prototype.move = () => {
   // .........
-}
+};
+
+let lpaddle1 = new Paddle(0);
+let rpaddle1 = new Paddle(BOARD_WIDTH - 1);
+lpaddle1.draw();
+rpaddle1.draw();
 //
 // ball.prototype.down = function () {
 //   this.pos[0] = this.pos[0] - 1
