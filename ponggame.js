@@ -1,5 +1,4 @@
-/* global $ BOARD_WIDTH:true BOARD_HEIGHT:true */
-
+/* global $ BOARD_WIDTH:true BOARD_HEIGHT:true document */
 
 const $game = $('#game');
 BOARD_WIDTH = 19;
@@ -36,19 +35,18 @@ function Paddle(column) {
   this.column = column;
 }
 
-Paddle.prototype.draw = () => {
+Paddle.prototype.draw = function draw() {
   for (let i = 0; i < BOARD_HEIGHT; i += 1) {
     const $cell = getcell(i, this.column);
     $cell.removeClass('paddle');
   }
-
   for (let i = 0; i < this.pos.length; i += 1) {
     const $cell = getcell(this.pos[i][0], this.pos[i][1]);
     $cell.addClass('paddle');
   }
 };
 
-Paddle.prototype.up = () => {
+Paddle.prototype.up = function up() {
   if (this.pos[0][0] !== 0) {
     const newedge = [this.pos[0][0] - 1, this.pos[0][1]];
     this.pos.unshift(newedge);
@@ -56,7 +54,7 @@ Paddle.prototype.up = () => {
   }
 };
 
-Paddle.prototype.down = () => {
+Paddle.prototype.down = function down() {
   if (this.pos[2][0] !== BOARD_HEIGHT - 1) {
     const newedge = [this.pos[2][0] + 1, this.pos[2][1]];
     this.pos.push(newedge);
@@ -66,131 +64,99 @@ Paddle.prototype.down = () => {
 
 function Ball(lpaddle, rpaddle) {
   this.pos = [5, 5];
-  this.dirh = -1;
-  this.dirv = 1;
+  this.dirx = -1;
+  this.diry = 0;
   this.lpaddle = lpaddle;
   this.rpaddle = rpaddle;
 }
 
-Ball.prototype.checkInLeftEnd = () => this.pos[1] === 0;
+Ball.prototype.checkInLeftEnd = function checkInLeftEnd() {
+  return this.pos[1] === 0;
+};
 
-Ball.prototype.checkInRightEnd = () => this.pos[1] === BOARD_WIDTH - 1;
+Ball.prototype.checkInRightEnd = function checkInRightEnd() {
+  return this.pos[1] === BOARD_WIDTH - 1;
+};
 
-Ball.prototype.draw = () => {
-  const $cells = $('cell');
+Ball.prototype.draw = function draw() {
+  const $cells = $('.cell');
   $cells.removeClass('ball');
-  const $cell = getcell(this.pos);
+  const $cell = getcell(this.pos[0], this.pos[1]);
   $cell.addClass('ball');
 };
 
-Ball.prototype.move = () => {
-  // .........
+Ball.prototype.move = function move() {
+  // ball bounces off the top and bottom of the board
+  if (this.pos[0] === 0 || this.pos[0] === BOARD_HEIGHT - 1) {
+    this.diry = -this.diry;
+  }
+  // ball bounces off the left paddle
+  if (this.pos[1] === 1) {
+    if (this.pos[0] === this.lpaddle.pos[0][0]) {
+      this.dirx = -this.dirx;
+      this.diry = -1;
+    }
+    if (this.pos[0] === this.lpaddle.pos[1][0]) {
+      this.dirx = -this.dirx;
+      this.diry = 0;
+    }
+    if (this.pos[0] === this.lpaddle.pos[2][0]) {
+      this.dirx = -this.dirx;
+      this.diry = 1;
+    }
+  }
+  // ball bounces off the right paddle
+  if (this.pos[1] === BOARD_WIDTH - 2) {
+    if (this.pos[0] === this.rpaddle.pos[0][0]) {
+      this.dirx = -this.dirx;
+      this.diry = -1;
+    }
+    if (this.pos[0] === this.rpaddle.pos[1][0]) {
+      this.dirx = -this.dirx;
+      this.diry = 0;
+    }
+    if (this.pos[0] === this.rpaddle.pos[2][0]) {
+      this.dirx = -this.dirx;
+      this.diry = 1;
+    }
+  }
+  const xpos = this.pos[1] + this.dirx;
+  const ypos = this.pos[0] + this.diry;
+  this.pos = [ypos, xpos];
 };
 
-let lpaddle1 = new Paddle(0);
-let rpaddle1 = new Paddle(BOARD_WIDTH - 1);
+const lpaddle1 = new Paddle(0);
+const rpaddle1 = new Paddle(BOARD_WIDTH - 1);
+const ball = new Ball(lpaddle1, rpaddle1);
 lpaddle1.draw();
 rpaddle1.draw();
-//
-// ball.prototype.down = function () {
-//   this.pos[0] = this.pos[0] - 1
-// }
-// ball.prototype.up = function () {
-//   this.pos[0] = this.pos[0] + 1
-// }
-// ball.prototype.right = function () {
-//   this.pos[1] = this.pos[1] + 1
-// }
-// ball.prototype.left = function () {
-//   this.pos[1] = this.pos[1] - 1
-// }
+setInterval(() => {
+  ball.move();
+  ball.draw();
+}, 250);
 
-// ball.prototype.bounce = function (Lpaddle, Rpaddle) {
-//   if (this.pos[1] === 0 && this.dirv === 'UP') {
-//     this.dirv = 'DOWN'
-//   }
-//   if (this.pos[1] === 11 && this.dirv === 'DOWN') {
-//     this.dirv = 'UP'
-//   }
-//   if (this.pos[0] === 1) {
-//     switch (this.pos[1]) {
-//       case Lpaddle[0][0]:
-//         this.dirv = 'UP'
-//         this.dirh = 'RIGHT'
-//         break;
-//       case Lpaddle[2][0]:
-//         this.dirv = 'DOWN'
-//         this.dirh = 'RIGHT'
-//         break;
-//       case Lpaddle[1][0]:
-//         this.dirv = ''
-//         this.dirh = 'RIGHT'
-//         default:
-//     }
-//   }
-//   if (this.pos[0] === 10) {
-//     switch (this.pos[1]) {
-//       case Rpaddle[0][0]:
-//         this.dirv = 'UP'
-//         this.dirh = 'LEFT'
-//         break;
-//       case Rpaddle[2][0]:
-//         this.dirv = 'DOWN'
-//         this.dirh = 'LEFT'
-//         break;
-//       case Rpaddle[1][0]:
-//         this.dirv = ''
-//         this.dirh = 'LEFT'
-//         default:
-//       }
-//     }
-// }
+$(document).keydown((event) => {
+  event.preventDefault();
+  switch (event.keyCode) {
+    case 38: // up arrow
+      rpaddle1.up();
+      break;
+    case 40: // down arrow
+      rpaddle1.down();
+      break;
+    case 87: // w key
+      lpaddle1.up();
+      break;
+    case 83: // s key
+      lpaddle1.down();
+      break;
+    default:
+  }
+  rpaddle1.draw();
+  lpaddle1.draw();
+});
 
 
-
-
-
-
-
-// var RDIRECTION = 'RDOWN';
-// $(document).keydown(function (event) {
-//   switch (event.keyCode) {
-//     case 38:
-//       RDIRECTION = 'RUP';
-//       break;
-//     case 40:
-//       RDIRECTION = 'RDOWN';
-//       break;
-//     default:
-//       return;
-//   }
-//   event.preventDefault();
-//   console.log(RDIRECTION);
-//   console.log(event.keyCode);
-// });
-// function grid (ball) {
-//   this.width = 12;
-//   this.height = 10
-//   this.Lpaddle = new Lpaddle()
-//   this.Rpaddle = new Rpaddle()
-// }
-//
-// grid.prototype.draw = function (Rpaddle, Lpaddle) {
-//   this.Rpaddle.draw()
-//   this.Lpaddle.draw()
-//   this.ball.draw()
-// }
-// var Grid = new grid
-// grid.prototype.draw();
-//
-// var game = setInterval(function () {
-//   var Lpaddle = grid.Lpaddle
-//   var Rpaddle = grid.Rpaddle
-//   var ball = grid.ball
-//
-//   switch (RDIRECTION) {
-//     case 'RUP':
-//       Rpaddle.upR()
-//       break;
-//   }
-// }, 250);
+// ball scores
+//  write a function that checks if ball is in the endzone
+// stop for one full second, then start game loop again
