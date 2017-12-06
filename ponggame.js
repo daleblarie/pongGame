@@ -3,6 +3,8 @@
 const $game = $('#game');
 BOARD_WIDTH = 19;
 BOARD_HEIGHT = 10;
+let Lscore = 0;
+let Rscore = 0;
 
 $game.append(() => {
   let str = '';
@@ -120,6 +122,30 @@ Ball.prototype.move = function move() {
       this.diry = 1;
     }
   }
+  if (this.pos[1] === 0) {
+    this.dirx = 0;
+    this.diry = 0;
+    setTimeout(() => {
+      this.pos = [5, 5];
+    }, 0);
+    setTimeout(() => {
+      Rscore += 1;
+      console.log(Rscore);
+      this.dirx = 1;
+    }, 1500);
+  }
+  if (this.pos[1] === BOARD_WIDTH - 1) {
+    this.dirx = 0;
+    this.diry = 0;
+    setTimeout(() => {
+      this.pos = [7, 5];
+    }, 0);
+    setTimeout(() => {
+      Lscore += 1;
+      console.log(Lscore);
+      this.dirx = -1;
+    }, 1500);
+  }
   const xpos = this.pos[1] + this.dirx;
   const ypos = this.pos[0] + this.diry;
   this.pos = [ypos, xpos];
@@ -130,9 +156,13 @@ const rpaddle1 = new Paddle(BOARD_WIDTH - 1);
 const ball = new Ball(lpaddle1, rpaddle1);
 lpaddle1.draw();
 rpaddle1.draw();
+ball.draw();
+
 setInterval(() => {
-  ball.move();
-  ball.draw();
+  if (ball.pos[1] !== 0 || ball.pos[1] !== BOARD_WIDTH - 1) {
+    ball.move();
+    ball.draw();
+  }
 }, 250);
 
 $(document).keydown((event) => {
