@@ -95,31 +95,47 @@ Ball.prototype.move = function move() {
   // ball bounces off the left paddle
   if (this.pos[1] === 1) {
     if (this.pos[0] === this.lpaddle.pos[0][0]) {
+      if (this.pos[0] === 0) {
+        this.diry = 1;
+      } else {
+        this.diry = -1;
+      }
       this.dirx = -this.dirx;
-      this.diry = -1;
     }
     if (this.pos[0] === this.lpaddle.pos[1][0]) {
       this.dirx = -this.dirx;
       this.diry = 0;
     }
     if (this.pos[0] === this.lpaddle.pos[2][0]) {
+      if (this.pos[0] === BOARD_HEIGHT - 1) {
+        this.diry = -1;
+      } else {
+        this.diry = 1;
+      }
       this.dirx = -this.dirx;
-      this.diry = 1;
     }
   }
   // ball bounces off the right paddle
   if (this.pos[1] === BOARD_WIDTH - 2) {
     if (this.pos[0] === this.rpaddle.pos[0][0]) {
+      if (this.pos[0] === 0) {
+        this.diry = 1;
+      } else {
+        this.diry = -1;
+      }
       this.dirx = -this.dirx;
-      this.diry = -1;
     }
     if (this.pos[0] === this.rpaddle.pos[1][0]) {
       this.dirx = -this.dirx;
       this.diry = 0;
     }
     if (this.pos[0] === this.rpaddle.pos[2][0]) {
+      if (this.pos[0] === BOARD_HEIGHT - 1) {
+        this.diry = -1;
+      } else {
+        this.diry = 1;
+      }
       this.dirx = -this.dirx;
-      this.diry = 1;
     }
   }
   if (this.pos[1] === 0) {
@@ -163,7 +179,7 @@ setInterval(() => {
     ball.move();
     ball.draw();
   }
-}, 250);
+}, 100);
 
 $(document).keydown((event) => {
   event.preventDefault();
